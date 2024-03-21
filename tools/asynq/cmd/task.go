@@ -181,6 +181,15 @@ var taskRunAllCmd = &cobra.Command{
 		$ asynq task runall --queue=myqueue --state=aggregating --group=mygroup`),
 }
 
+var taskEnqueueCmd = &cobra.Command{
+	Use:   "enqueue --queue=<queue> --payload=<payload>",
+	Short: "Enqueue a new tasks for a queue",
+	Args:  cobra.NoArgs,
+	Run:   taskEnqueue,
+	Example: heredoc.Doc(`
+		$ asynq task enqueue --queue=myqueue --payload={"UserID": 42, }`),
+}
+
 func taskList(cmd *cobra.Command, args []string) {
 	qname, err := cmd.Flags().GetString("queue")
 	if err != nil {
@@ -652,4 +661,28 @@ func taskRunAll(cmd *cobra.Command, args []string) {
 		os.Exit(1)
 	}
 	fmt.Printf("%d tasks are now pending\n", n)
+}
+
+func taskEnqueue(cmd *cobra.Command, args []string) {
+	qname, err := cmd.Flags().GetString("queue")
+	if err != nil {
+		fmt.Printf("error: %v\n", err)
+		os.Exit(1)
+	}
+	payload, err := cmd.Flags().GetString("payload")
+	if err != nil {
+		fmt.Printf("error: %v\n", err)
+		os.Exit(1)
+	}
+
+	i := createInspector()
+
+	fmt.Println(qname)
+	fmt.Printf(payload)
+	fmt.Println(i)
+
+	if err != nil {
+		fmt.Printf("error: %v\n", err)
+		os.Exit(1)
+	}
 }
